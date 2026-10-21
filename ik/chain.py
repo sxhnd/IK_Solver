@@ -14,7 +14,12 @@ class Chain2D:
 
     def joint_positions(self, q):
         headings = np.cumsum(q)
+        steps = np.column_stack((
+            self.lengths * np.cos(headings),
+            self.lengths * np.sin(headings),
+        ))
+        return np.vstack((self.base, self.base + np.cumsum(steps, axis=0)))
 
 
 def wrap_angle(a):
-    pass
+    return np.mod(np.asarray(a) + np.pi, 2 * np.pi) - np.pi
