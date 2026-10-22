@@ -10,7 +10,7 @@ import numpy as np
 from ik.chain import Chain2D
 
 # A fully extended arm is singular: the Jacobian loses rank and Jacobian
-# solvers can stall there. About 6 degrees of bend at every joint avoids it.
+# solvers can stall there. 0.1 rad is about 6 degrees of bend per joint.
 DEFAULT_JOINT_ANGLE_RAD: Final = 0.1
 
 
@@ -41,8 +41,8 @@ def finish(
     history: list[np.ndarray],
 ) -> IKResult:
     """Build the solver's result, measuring the error from the final angles."""
-    # The error comes from forward kinematics, never from a solver's own
-    # bookkeeping, so a buggy solver cannot report a false success.
+    # The error is measured here, not taken from the solver, so a buggy
+    # solver cannot report success it did not reach.
     error = float(np.linalg.norm(chain.end_effector(q) - target))
     return IKResult(
         q=q,

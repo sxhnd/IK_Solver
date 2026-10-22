@@ -1,4 +1,4 @@
-"""Closed-form IK for a two-link arm. Exact, so it is the ground truth for the rest."""
+"""Closed-form IK for a two-link arm, used as ground truth for the other solvers."""
 from __future__ import annotations
 
 from collections.abc import Sequence
@@ -9,7 +9,6 @@ import numpy as np
 from ik.chain import Chain2D
 
 # Rounding can push cos(q2) just past 1 for a target exactly at full reach.
-# A margin of 1e-12 is about 4500 times machine epsilon for doubles.
 REACH_MARGIN: Final = 1e-12
 
 
@@ -18,6 +17,8 @@ def solve_two_link(chain: Chain2D, target: Sequence[float]) -> list[np.ndarray]:
 
     The list is empty when the target is out of reach, otherwise
     [elbow_down, elbow_up]. The two are equal when the arm is straight.
+    A target at the base of an arm with equal links has infinitely many
+    solutions, and only these two are returned.
 
     Raises
     ------
@@ -36,8 +37,8 @@ def solve_two_link(chain: Chain2D, target: Sequence[float]) -> list[np.ndarray]:
     elbow_angle = np.arccos(cos_q2)
     solutions = []
     for q2 in (elbow_angle, -elbow_angle):
-        # The bent elbow turns the arm away from the target direction by
-        # atan2(l2 sin q2, l1 + l2 cos q2), so q1 subtracts that angle.
+        # The bent elbow adds atan2(l2 sin q2, l1 + l2 cos q2) to the direction
+        # of link 1, so q1 subtracts it from the direction of the target.
         q1 = np.arctan2(y, x) - np.arctan2(l2 * np.sin(q2), l1 + l2 * np.cos(q2))
         solutions.append(np.array([q1, q2]))
     return solutions

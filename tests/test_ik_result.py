@@ -1,3 +1,5 @@
+from dataclasses import FrozenInstanceError
+
 import numpy as np
 import pytest
 
@@ -8,7 +10,7 @@ from ik.ik_result import finish, initial_q
 def test_default_start_is_bent_not_straight():
     q = initial_q(Chain2D([1.0, 1.0, 1.0]), None)
     assert q.shape == (3,)
-    assert np.all(q != 0)  # the straight pose is a singularity (see Task 7)
+    assert np.all(q != 0)  # A straight arm is singular.
 
 
 def test_initial_q_copies_the_callers_array():
@@ -27,3 +29,9 @@ def test_finish_measures_error_with_forward_kinematics():
     assert miss.iterations == 3
     hit = finish(chain, straight, np.array([2.0, 0.0]), iterations=3, tol=1e-4, history=[])
     assert hit.is_converged
+
+
+def test_ik_result_fields_cannot_be_reassigned():
+    result = finish(Chain2D([1.0]), np.array([0.0]), np.array([1.0, 0.0]), 0, 1e-4, [])
+    with pytest.raises(FrozenInstanceError):
+        result.error = 5.0
