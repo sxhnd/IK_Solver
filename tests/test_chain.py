@@ -53,10 +53,35 @@ def test_reach_is_sum_of_lengths():
     assert Chain2D([1.0, 0.7, 0.3]).reach == pytest.approx(2.0)
 
 
-@pytest.mark.parametrize("bad", [[], [1.0, 0.0], [1.0, -1.0]])
+@pytest.mark.parametrize(
+    "bad",
+    [[], [1.0, 0.0], [1.0, -1.0], [float("nan")], [float("inf")], [[1.0, 2.0]]],
+)
 def test_rejects_bad_lengths(bad):
     with pytest.raises(ValueError):
         Chain2D(bad)
+
+
+@pytest.mark.parametrize("bad", [(1.0,), (1.0, 2.0, 3.0), [[1.0, 2.0]]])
+def test_rejects_base_without_two_coordinates(bad):
+    with pytest.raises(ValueError):
+        Chain2D([1.0], base=bad)
+
+
+@pytest.mark.parametrize("bad", [[0.5], [0.5, 0.0, 0.0]])
+def test_joint_positions_wrong_number_of_angles_raises_value_error(bad):
+    with pytest.raises(ValueError):
+        Chain2D([1.0, 2.0]).joint_positions(bad)
+
+
+def test_end_effector_is_the_last_joint_position():
+    chain = Chain2D([1.0, 0.7, 0.3])
+    q = [0.4, -2.1, 1.3]
+    np.testing.assert_allclose(chain.end_effector(q), chain.joint_positions(q)[-1])
+
+
+def test_n_joints_counts_links():
+    assert Chain2D([1.0, 0.7, 0.3]).n_joints == 3
 
 
 def test_wrap_angle():
@@ -64,3 +89,7 @@ def test_wrap_angle():
         wrap_angle([0.0, 3 * np.pi / 2, -3 * np.pi / 2]),
         [0.0, -np.pi / 2, np.pi / 2],
     )
+
+
+def test_wrap_angle_maps_pi_to_minus_pi():
+    np.testing.assert_allclose(wrap_angle([np.pi, -np.pi]), [-np.pi, -np.pi])
