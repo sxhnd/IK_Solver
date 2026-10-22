@@ -12,17 +12,15 @@ This is still a 2D geometry project. It doesn’t handle obstacles, joint limits
 
 ## Try it
 
-Use Python 3.10 or later. From a terminal:
+Use Python 3.12 or later with [uv](https://docs.astral.sh/uv/). From a terminal:
 
 ```sh
 git clone https://github.com/sxhnd/IK_Solver.git
 cd IK_Solver
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.txt
+uv sync
 ```
 
-From the repository directory, start Python and run:
+From the repository directory, start `uv run python` and run:
 
 ```python
 from ik.analytic import solve_two_link
@@ -42,14 +40,15 @@ The interactive arm on [my site](https://sxhnd.github.io/) uses a JavaScript por
 
 ## Run the tests
 
-With the virtual environment active, run from the repository directory:
+From the repository directory, run:
 
 ```sh
-python -m pytest -q
+uv run pytest -q
 ```
 
 ## Code
 
 - [`ik/chain.py`](ik/chain.py): arm geometry and forward kinematics.
 - [`ik/analytic.py`](ik/analytic.py): the two-link inverse kinematics solver.
+- [`ik/ccd.py`](ik/ccd.py): the cyclic coordinate descent solver for arms with any number of links.
 - [`ik/ik_result.py`](ik/ik_result.py): result storage and helpers for future iterative solvers.
