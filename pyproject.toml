@@ -1,2 +1,114 @@
+[project]
+name = "ik-solver"
+version = "0.1.0"
+description = "Inverse kinematics for planar serial arms, built from scratch."
+requires-python = ">=3.12"
+dependencies = ["numpy>=2.0"]
+
+[dependency-groups]
+dev = [
+    "coverage>=7.6",
+    "hypothesis>=6.100",
+    "mypy==2.4.0",
+    "pre-commit>=4.0",
+    "pytest>=8.4",
+    "ruff==0.17.1",
+]
+
+[build-system]
+requires = ["uv_build>=0.12.23,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = ""
+module-name = "ik"
+
+[tool.ruff]
+line-length = 99
+target-version = "py312"
+src = ["ik", "tests"]
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint]
+select = [
+    "A", "ANN", "ARG", "B", "BLE", "C4", "C90", "D", "DTZ", "E", "ERA", "F", "FBT", "FIX",
+    "G", "I", "ICN", "INP", "ISC", "LOG", "N", "NPY", "PERF", "PGH", "PIE", "PL", "PT", "PTH",
+    "RET", "RSE", "RUF", "S", "SIM", "SLF", "T10", "T20", "TD", "TID", "TRY", "UP", "W",
+    "RUF069",
+]
+ignore = [
+    # assert is permitted for internal invariants (ERR-04).
+    "S101",
+    # Error messages carry their values at the raise site (ERR-09).
+    "TRY003",
+    # TODO is a permitted tag (CMT-08); the TD rules check its format.
+    "FIX002",
+    # Magic methods document themselves through the data model.
+    "D105",
+]
+# Preview mode is on only so that RUF069 (float equality, ERR-12) can be selected by
+# name; explicit-preview-rules keeps every other preview rule out of the selection.
+preview = true
+explicit-preview-rules = true
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["D", "INP001", "PLR2004"]
+
+[tool.ruff.lint.pycodestyle]
+# PEP 8 allows 99-column code on the condition that prose still wraps at 72.
+max-doc-length = 72
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pylint]
+max-args = 5
+max-positional-args = 3
+max-branches = 10
+max-returns = 5
+max-statements = 30
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"abc".msg = "Use typing.Protocol (ARC-08)."
+"numpy.linalg.inv".msg = "Solve the system with numpy.linalg.solve (PRF-05)."
+"os.environ".msg = "Read configuration in a CLI module and pass it in (ARC-11)."
+"os.getenv".msg = "Read configuration in a CLI module and pass it in (ARC-11)."
+"random".msg = "Pass in a seeded numpy.random.Generator (PRF-06)."
+
+[tool.mypy]
+python_version = "3.12"
+files = ["ik", "tests"]
+strict = true
+warn_unreachable = true
+enable_error_code = [
+    "ignore-without-code",
+    "possibly-undefined",
+    "redundant-expr",
+    "truthy-bool",
+    "unused-awaitable",
+]
+
 [tool.pytest.ini_options]
+minversion = "8.0"
 testpaths = ["tests"]
+addopts = ["-ra", "--strict-markers", "--strict-config", "--import-mode=importlib"]
+xfail_strict = true
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+branch = true
+source_pkgs = ["ik"]
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true
+skip_covered = true
+exclude_also = ["if TYPE_CHECKING:"]
