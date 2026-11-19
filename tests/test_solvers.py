@@ -32,9 +32,7 @@ def random_poses(chain: Chain2D, n: int, seed: int) -> npt.NDArray[np.float64]:
     return rng.uniform(-np.pi, np.pi, size=(n, chain.n_joints))
 
 
-def random_reachable_targets(
-    chain: Chain2D, n: int, seed: int
-) -> list[npt.NDArray[np.float64]]:
+def random_reachable_targets(chain: Chain2D, n: int, seed: int) -> list[npt.NDArray[np.float64]]:
     # The tip of any pose is reachable. Many poses reach the same point,
     # tests compare tip positions, not joint angles.
     return [chain.end_effector(q) for q in random_poses(chain, n, seed)]

@@ -4,6 +4,10 @@ Given a robot arm and a target point, find the joint angles that put the arm's t
 
 I’m learning robotics by building it, so the code favors clarity and tests over features. A live demo of the two-link solver (a JavaScript port) is on [my site](https://sxhnd.github.io/).
 
+![CCD moving a four-link arm onto a target, and the error shrinking each sweep](docs/ccd_reach.png)
+
+*The CCD solver pulling a four-link arm onto a target. Left: the arm after each sweep. Right: distance from the tip to the target on a log scale. Regenerate with `uv run python examples/make_figure.py`.*
+
 ## Status
 
 | Piece | State |
@@ -52,9 +56,9 @@ arm = Chain2D([1.0, 0.8, 0.5])
 result = solve_ccd(arm, [1.5, 1.0])
 
 print(result.is_converged)  # True
-print(result.iterations)    # 4
-print(result.error)         # distance from tip to target, about 6e-05
-print(result.q.round(3))    # [0.145 0.367 1.442]
+print(result.iterations)  # 4
+print(result.error)  # distance from tip to target, about 6e-05
+print(result.q.round(3))  # [0.145 0.367 1.442]
 ```
 
 An unreachable target does not raise. The solver stops at the iteration limit with `is_converged == False`, so always check that flag.
@@ -102,6 +106,7 @@ Cyclic coordinate descent sweeps the joints from the tip back to the base. At ea
 | [`ik/jacobian.py`](ik/jacobian.py) | `jacobian` (exact) and `jacobian_numeric` (finite differences) |
 | [`ik/ik_result.py`](ik/ik_result.py) | `IKResult`, default tolerance and iteration limit, helpers |
 | [`ik/array_types.py`](ik/array_types.py) | `FloatArray` type alias |
+| [`examples/make_figure.py`](examples/make_figure.py) | Generates the figure at the top of this README |
 | [`tests/`](tests/) | One test file per module. `test_solvers.py` runs every iterative solver through the same checks |
 
 To add a solver, write a function with the same signature as `solve_ccd`, return an `IKResult` through `finish()`, and add it to `SOLVERS` in `tests/test_solvers.py`. It then gets the shared tests for free.
@@ -116,3 +121,7 @@ uv run coverage run -m pytest && uv run coverage report   # fails under 90%
 ```
 
 The code is fully type-annotated, and ruff and mypy (strict) pass on it.
+
+## License
+
+Released under the MIT License. See [LICENSE](LICENSE) for details.

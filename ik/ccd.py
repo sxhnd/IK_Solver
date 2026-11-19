@@ -60,9 +60,7 @@ def solve_ccd(  # noqa: PLR0917
 
     q = initial_q(chain, q0)
     if q.shape != chain.lengths.shape or not np.isfinite(q).all():
-        raise ValueError(
-            f"expected {chain.n_joints} finite starting angles, got {q!r}"
-        )
+        raise ValueError(f"expected {chain.n_joints} finite starting angles, got {q!r}")
 
     history: list[FloatArray] = []
     for iteration in range(max_iters + 1):

@@ -9,6 +9,7 @@ dependencies = ["numpy>=2.0"]
 dev = [
     "coverage>=7.6",
     "hypothesis>=6.100",
+    "matplotlib>=3.11.2",
     "mypy==2.4.0",
     "pre-commit>=4.0",
     "pytest>=8.4",
@@ -55,6 +56,7 @@ explicit-preview-rules = true
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["D", "INP001", "PLR2004"]
+"examples/**" = ["INP001"]
 
 [tool.ruff.lint.pycodestyle]
 # PEP 8 allows 99-column code on the condition that prose still wraps at 72.
