@@ -2,7 +2,7 @@
 
 Given a robot arm and a target point, find the joint angles that put the arm's tip on the target. This is the inverse kinematics (IK) problem. This repo solves it for planar (2D) arms, built from scratch on top of NumPy.
 
-I’m learning robotics by building it, so the code favors clarity and tests over features. A live demo of the two-link solver (a JavaScript port) is on [my site](https://sxhnd.github.io/).
+I’m learning robotics by building it, so the code favors clarity and tests over features. A live demo of the two-link solver (a JavaScript port via Claude Code) is on [my site](https://sxhnd.github.io/).
 
 ![CCD moving a four-link arm onto a target, and the error shrinking each sweep](docs/ccd_reach.png)
 
