@@ -11,9 +11,10 @@ import numpy.typing as npt
 import pytest
 from ik.ccd import solve_ccd
 from ik.chain import Chain2D
+from ik.fabrik import solve_fabrik
 from ik.ik_result import IKResult
 
-SOLVERS = [solve_ccd]
+SOLVERS = [solve_ccd, solve_fabrik]
 # Solvers that must handle unreachable targets. A solver known to fail
 # is left out of this list.
 UNREACHABLE_SOLVERS = SOLVERS
