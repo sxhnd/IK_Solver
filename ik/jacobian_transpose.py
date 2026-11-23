@@ -1,5 +1,5 @@
-
 """Jacobian transpose for planar arms."""
+
 import numpy as np
 import numpy.typing as npt
 
@@ -18,16 +18,42 @@ from ik.jacobian import jacobian
 DEFAULT_ALPHA = 0.1
 
 
-def solve_jacobian_transpose(
+def solve_jacobian_transpose(  # noqa: PLR0913, PLR0917
     chain: Chain2D,
     target: npt.ArrayLike,
-    q0: npt.ArrayLike | None = None, 
+    q0: npt.ArrayLike | None = None,
     tol: float = DEFAULT_TOLERANCE,
     max_iters: int = DEFAULT_MAX_ITERATIONS,
     alpha: float = DEFAULT_ALPHA,
 ) -> IKResult:
+    """Find joint angles that move the end effector toward ``target``.
+
+    Each step moves the joints by ``alpha * J.T @ e``, where ``e`` is
+    the vector from the tip to the target.
+
+    Parameters
+    ----------
+    chain
+        Arm geometry to solve.
+    target
+        Target point with shape ``(2,)``.
+    q0
+        Optional initial joint angles with shape ``(chain.n_joints,)``.
+    tol
+        Tip-to-target distance that counts as convergence.
+    max_iters
+        Maximum number of steps.
+    alpha
+        Step size.
+
+    Raises
+    ------
+    ValueError
+        If the target, starting angles, tolerance, step size, or
+        iteration limit is invalid.
+    """
     target_array = np.asarray(target, dtype=np.float64)
-    
+
     if target_array.shape != (2,) or not np.isfinite(target_array).all():
         raise ValueError(f"expected a finite target with shape (2,), got {target_array!r}")
     if not np.isfinite(tol) or tol <= 0:
@@ -38,12 +64,12 @@ def solve_jacobian_transpose(
         raise ValueError(f"expected a finite positive alpha, got {alpha!r}")
 
     q = initial_q(chain, q0)
-    
+
     if q.shape != chain.lengths.shape or not np.isfinite(q).all():
         raise ValueError(f"expected {chain.n_joints} finite starting angles, got {q!r}")
-    
+
     history: list[FloatArray] = []
-    
+
     for iteration in range(max_iters + 1):
         # vector from tip to target
         e = target_array - chain.end_effector(q)
@@ -51,12 +77,9 @@ def solve_jacobian_transpose(
             return finish(chain, q, target_array, iteration, tol, history)
         if iteration == max_iters:
             break
-        
-        J = jacobian(chain,q)
-        q = q + alpha * J.T @ e
+
+        jac = jacobian(chain, q)
+        q = q + alpha * jac.T @ e
         history.append(q.copy())
-        
+
     return finish(chain, q, target_array, max_iters, tol, history)
-        
-        
-    
