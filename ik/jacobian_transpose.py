@@ -40,7 +40,7 @@ def solve_jacobian_transpose(
             break
         
         J = jacobian(chain,q)
-        q = q + alpha * J @ e
+        q = q + alpha * J.T @ e
         history.append(q.copy())
         
     return finish(chain, q, target_array, max_iters, tol, history)
