@@ -11,6 +11,7 @@ from typing import Final
 import numpy as np
 import numpy.typing as npt
 import pytest
+from ik.array_types import FloatArray
 from ik.chain import Chain2D
 from ik.jacobian import jacobian
 from ik.jacobian_transpose import solve_jacobian_transpose
@@ -45,7 +46,7 @@ def finite_difference_jacobian(
     return np.column_stack(columns)
 
 
-def explicit_transpose_times(jac: npt.NDArray[np.float64], v: npt.ArrayLike) -> npt.NDArray:
+def explicit_transpose_times(jac: FloatArray, v: npt.ArrayLike) -> FloatArray:
     """Compute J^T v with explicit loops, not .T or @."""
     v = np.asarray(v, dtype=np.float64)
     rows, cols = jac.shape
