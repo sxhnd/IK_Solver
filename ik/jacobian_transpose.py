@@ -27,10 +27,23 @@ def solve_jacobian_transpose(
     alpha: float = DEFAULT_ALPHA,
 ) -> IKResult:
     target_array = np.asarray(target, dtype=np.float64)
-   
+    
+    if target_array.shape != (2,) or not np.isfinite(target_array).all():
+        raise ValueError(f"expected a finite target with shape (2,), got {target_array!r}")
+    if not np.isfinite(tol) or tol <= 0:
+        raise ValueError(f"expected a finite positive tolerance, got {tol!r}")
+    if max_iters < 0:
+        raise ValueError(f"expected a non-negative integer max_iters, got {max_iters!r}")
+    if not np.isfinite(alpha) or alpha <= 0:
+        raise ValueError(f"expected a finite positive alpha, got {alpha!r}")
 
     q = initial_q(chain, q0)
+    
+    if q.shape != chain.lengths.shape or not np.isfinite(q).all():
+        raise ValueError(f"expected {chain.n_joints} finite starting angles, got {q!r}")
+    
     history: list[FloatArray] = []
+    
     for iteration in range(max_iters + 1):
         # vector from tip to target
         e = target_array - chain.end_effector(q)
